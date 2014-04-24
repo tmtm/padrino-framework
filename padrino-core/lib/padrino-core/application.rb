@@ -140,17 +140,12 @@ module Padrino
 
       ##
       # Returns default list of path globs to load as dependencies.
-      # Appends custom dependency patterns to the be loaded for your Application.
       #
       # @return [Array]
       #   list of path globs to load as dependencies
       #
-      # @example
-      #   MyApp.dependencies << "#{Padrino.root}/uploaders/**/*.rb"
-      #   MyApp.dependencies << Padrino.root('other_app', 'controllers.rb')
-      #
       def dependencies
-        [
+        @_dependencies ||= [
           'urls.rb',
           'config/urls.rb',
           'mailers/*.rb',
@@ -159,7 +154,19 @@ module Padrino
           'controllers.rb',
           'helpers/**/*.rb',
           'helpers.rb',
-        ].map { |file| Dir[File.join(settings.root, file)] }.flatten
+        ]
+        @_dependencies.map { |file| Dir[File.join(settings.root, file)] }.flatten
+      end
+
+      # Appends custom dependency patterns to the be loaded for your Application.
+      #
+      # @example
+      #   MyApp.append_dependencies "#{Padrino.root}/uploaders/**/*.rb"
+      #   MyApp.append_dependencies Padrino.root('other_app', 'controllers.rb')
+      #
+      def append_dependencies(*files)
+        dependencies  # to initialize @_dependencies
+        @_dependencies.concat files
       end
 
       ##
